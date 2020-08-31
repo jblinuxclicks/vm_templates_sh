@@ -21,8 +21,59 @@ version control repository clone:
 
 Usage
 -----
+to build virtual machine using auto install methods or chroot scripts:
         
-        TODO - fix usage info
+        # NOTE, relevant comments -- transfer file(s) ; run manual commands
+        
+        [VOL_MGR=zfs] sh vminstall_auto.sh [<distro> [<guest>]]
+        
+        sh vminstall_chroot.sh [<distro> [<guest>]]
+        
+build examples:
+        
+        [VOL_MGR=zfs] sh vminstall_auto.sh [freebsd [freebsd-Release-zfs]]
+        
+        sh vminstall_chroot.sh [freebsd [freebsd-Release-zfs]]
+
+[optional] Vagrant option - (in running VM) add vagrant user:
+        
+        sudo sh /root/init/<variant>/vagrantuser.sh
+        
+[optional] Vagrant option - (with VM shutdown) make box:
+        
+        cd build/<guest> ; sh vmrun.sh box_vagrant <guest>
+
+to update and execute shell provisioning scripts on running virtual machine:
+        
+        tar -c init/common init/<variant> -C scripts <variant> | \
+        
+          ssh <user>@<ipaddr> "cat - > /tmp/scripts.tar"
+        
+        ssh <user>@<ipaddr> <<-EOF
+        
+        cd /tmp ; tar -xf scripts.tar ; mv <variant> scripts
+        
+        sudo cp -r init scripts /root/
+        
+        sudo sh /root/scripts/<script>.sh
+        
+        EOF
+        
+provision example:
+        
+        tar -c init/common init/freebsd -C scripts freebsd | \
+        
+          ssh packer@10.0.2.15 "cat - > /tmp/scripts.tar"
+        
+        ssh packer@10.0.2.15 <<-EOF
+        
+        cd /tmp ; tar -xf scripts.tar ; mv freebsd scripts
+        
+        sudo cp -r init scripts /root/
+        
+        sudo sh /root/scripts/upgradepkgs.sh
+        
+        EOF
 
 Author/Copyright
 ----------------
